@@ -9,13 +9,11 @@ export default {
     container: {
       center: true,
       padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       fontFamily: {
-        sans: ['Nunito', 'sans-serif'],
+        sans: ['Quicksand', 'Comfortaa', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -85,7 +83,7 @@ export default {
         },
         "mood-pop": {
           "0%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.3)" },
+          "50%": { transform: "scale(1.2)" },
           "100%": { transform: "scale(1)" },
         },
       },

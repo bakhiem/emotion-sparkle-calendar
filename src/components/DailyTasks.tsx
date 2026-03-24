@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TaskEntry } from '@/lib/moodStore';
-import { Plus, Check, Sparkles } from 'lucide-react';
+import { Plus, Check, Leaf } from 'lucide-react';
 
 interface DailyTasksProps {
   tasks: TaskEntry[];
@@ -20,56 +20,55 @@ const DailyTasks = ({ tasks, onToggle, onAdd }: DailyTasksProps) => {
   };
 
   return (
-    <div className="card-3d gradient-bg-2 p-6">
+    <div className="nature-card">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-secondary" />
+          <Leaf className="w-5 h-5 text-primary" />
           Today's Tasks
         </h2>
-        <span className={`text-sm font-extrabold px-3 py-1 rounded-full ${
+        <span className={`text-sm font-bold px-3 py-1 rounded-full ${
           pct === 100 && tasks.length > 0
-            ? 'bg-secondary/20 text-secondary'
-            : 'bg-primary/10 text-primary'
+            ? 'bg-primary/15 text-primary'
+            : 'bg-muted text-muted-foreground'
         }`}>
           {completed}/{tasks.length}
         </span>
       </div>
 
       {tasks.length > 0 && (
-        <div className="w-full bg-muted/60 rounded-full h-3 mb-4 overflow-hidden">
+        <div className="w-full bg-muted rounded-full h-2.5 mb-4 overflow-hidden">
           <div
-            className="h-3 rounded-full transition-all duration-700 bg-gradient-to-r from-primary via-accent to-secondary"
+            className="h-2.5 rounded-full transition-all duration-700 bg-primary"
             style={{ width: `${pct}%` }}
           />
         </div>
       )}
 
       <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
-        {tasks.map((task, idx) => (
+        {tasks.map(task => (
           <button
             key={task.id}
             onClick={() => onToggle(task.id)}
-            className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-300 ${
+            className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 ${
               task.completed
-                ? 'bg-secondary/10 shadow-sm'
-                : 'bg-card/80 shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                ? 'bg-primary/5'
+                : 'bg-muted/40 hover:bg-muted/70'
             }`}
-            style={{ animationDelay: `${idx * 50}ms` }}
           >
-            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+            <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
               task.completed
-                ? 'bg-gradient-to-br from-secondary to-primary border-transparent shadow-sm'
-                : 'border-muted-foreground/40 hover:border-primary'
+                ? 'bg-primary border-primary'
+                : 'border-muted-foreground/30'
             }`}>
-              {task.completed && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
+              {task.completed && <Check className="w-3 h-3 text-primary-foreground" />}
             </div>
-            <span className={`text-sm font-semibold ${task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+            <span className={`text-sm font-medium ${task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
               {task.text}
             </span>
           </button>
         ))}
         {tasks.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-6">No tasks yet — add one below! ✍️</p>
+          <p className="text-sm text-muted-foreground text-center py-6">No tasks yet — plant one below 🌱</p>
         )}
       </div>
 
@@ -79,11 +78,11 @@ const DailyTasks = ({ tasks, onToggle, onAdd }: DailyTasksProps) => {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()}
           placeholder="Add a task..."
-          className="flex-1 px-4 py-2.5 rounded-xl bg-card/80 border border-border/50 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm transition-shadow focus:shadow-md"
+          className="flex-1 px-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
         />
         <button
           onClick={handleAdd}
-          className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground hover:shadow-lg hover:scale-105 transition-all active:scale-95"
+          className="p-2.5 rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity active:scale-95"
         >
           <Plus className="w-5 h-5" />
         </button>
