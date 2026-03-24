@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { MoodEntry, MOODS, MoodType } from '@/lib/moodStore';
+import { MOOD_IMAGES } from '@/lib/moodImages';
 import { BarChart3 } from 'lucide-react';
 
 interface MoodAnalyticsProps {
