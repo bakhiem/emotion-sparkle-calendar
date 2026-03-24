@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { MoodEntry, MOODS, getDateKey } from '@/lib/moodStore';
+import { MOOD_IMAGES } from '@/lib/moodImages';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MoodCalendarProps {
