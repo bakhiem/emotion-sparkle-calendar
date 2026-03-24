@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { MoodEntry, MOODS, MoodType } from '@/lib/moodStore';
-import { BarChart3 } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 interface MoodAnalyticsProps {
   moods: MoodEntry[];
@@ -17,6 +17,8 @@ const BAR_BG: Record<MoodType, string> = {
   bad: 'bg-mood-bad',
   awful: 'bg-mood-awful',
 };
+
+const STAT_BG = ['pastel-lavender', 'pastel-pink', 'pastel-sky'];
 
 const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
   const stats = useMemo(() => {
@@ -44,54 +46,56 @@ const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
 
   if (!stats) {
     return (
-      <div className="nature-card">
-        <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-accent" />
-          Mood Insights
+      <div className="cute-card">
+        <h2 className="text-sm font-extrabold text-foreground mb-2 flex items-center gap-1.5" style={{ fontFamily: "'Baloo 2', cursive" }}>
+          <Heart className="w-4 h-4 text-secondary fill-secondary" />
+          Insights
         </h2>
-        <p className="text-sm text-muted-foreground">Start checking in to see your insights 🌻</p>
+        <p className="text-xs text-muted-foreground">check in to see your stats~ 📊</p>
       </div>
     );
   }
 
   const topMoodDef = MOODS.find(m => m.type === stats.topMood[0]);
 
+  const statItems = [
+    { value: String(stats.streak), label: 'streak 🔥' },
+    { value: stats.avgScore.toFixed(1), label: 'avg ⭐' },
+    { value: topMoodDef?.emoji || '—', label: 'top mood' },
+  ];
+
   return (
-    <div className="nature-card">
-      <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-        <BarChart3 className="w-5 h-5 text-accent" />
-        Mood Insights
+    <div className="cute-card">
+      <h2 className="text-sm font-extrabold text-foreground mb-3 flex items-center gap-1.5" style={{ fontFamily: "'Baloo 2', cursive" }}>
+        <Heart className="w-4 h-4 text-secondary fill-secondary" />
+        Insights
       </h2>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {[
-          { value: String(stats.streak), label: 'Day Streak 🔥', bg: 'bg-primary/8' },
-          { value: stats.avgScore.toFixed(1), label: 'Avg Mood ⭐', bg: 'bg-secondary/8' },
-          { value: topMoodDef?.emoji || '—', label: 'Most Common', bg: 'bg-accent/8' },
-        ].map(({ value, label, bg }) => (
-          <div key={label} className={`${bg} rounded-2xl p-4 text-center border border-border/30`}>
-            <p className="text-2xl font-bold text-foreground">{value}</p>
-            <p className="text-xs text-muted-foreground font-semibold mt-1">{label}</p>
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        {statItems.map(({ value, label }, idx) => (
+          <div key={label} className={`${STAT_BG[idx]} rounded-2xl p-3 text-center`}>
+            <p className="text-xl font-extrabold text-foreground">{value}</p>
+            <p className="text-[10px] text-muted-foreground font-bold mt-0.5">{label}</p>
           </div>
         ))}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {MOODS.map(({ type, emoji }) => {
           const count = stats.counts[type];
           const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
           return (
-            <div key={type} className="flex items-center gap-3">
-              <span className="text-xl w-8 text-center">{emoji}</span>
+            <div key={type} className="flex items-center gap-2">
+              <span className="text-base w-6 text-center">{emoji}</span>
               <div className="flex-1">
-                <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                   <div
-                    className={`h-2.5 rounded-full transition-all duration-1000 ${BAR_BG[type]}`}
+                    className={`h-2 rounded-full transition-all duration-1000 ${BAR_BG[type]}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
               </div>
-              <span className="text-xs font-semibold text-muted-foreground w-8 text-right">{count}</span>
+              <span className="text-[10px] font-bold text-muted-foreground w-5 text-right">{count}</span>
             </div>
           );
         })}
