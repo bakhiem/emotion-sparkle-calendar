@@ -82,12 +82,12 @@ const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
       </div>
 
       <div className="space-y-3">
-        {MOODS.map(({ type, emoji }) => {
+        {MOODS.map(({ type }) => {
           const count = stats.counts[type];
           const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
           return (
             <div key={type} className="flex items-center gap-3">
-              <span className="text-xl w-8 text-center">{emoji}</span>
+              <img src={MOOD_IMAGES[type]} alt={type} width={28} height={28} className="w-7 h-7" />
               <div className="flex-1">
                 <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
                   <div
