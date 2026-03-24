@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import MoodPicker from '@/components/MoodPicker';
 import MoodCalendar from '@/components/MoodCalendar';
 import DailyTasks from '@/components/DailyTasks';
@@ -46,26 +46,28 @@ const Index = () => {
   })();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Colorful background blobs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/8 blur-3xl" />
+        <div className="absolute top-1/3 -right-48 w-[500px] h-[500px] rounded-full bg-accent/8 blur-3xl" />
+        <div className="absolute -bottom-32 left-1/4 w-[400px] h-[400px] rounded-full bg-secondary/8 blur-3xl" />
+      </div>
+
+      <div className="relative max-w-lg mx-auto px-4 py-8 space-y-6">
         {/* Header */}
-        <div className="text-center">
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-            🌤️ MoodFlow
+        <div className="text-center py-4">
+          <h1 className="text-4xl font-extrabold tracking-tight">
+            <span className="bg-clip-text text-transparent gradient-hero">MoodFlow</span>
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">{greeting} — {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          <p className="text-muted-foreground text-sm mt-2 font-semibold">
+            {greeting} — {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
         </div>
 
-        {/* Mood Check-in */}
         <MoodPicker selected={todayMood} onSelect={handleMoodSelect} />
-
-        {/* Daily Tasks */}
         <DailyTasks tasks={todayTasks} onToggle={handleToggleTask} onAdd={handleAddTask} />
-
-        {/* Calendar */}
         <MoodCalendar moods={moods} />
-
-        {/* Analytics */}
         <MoodAnalytics moods={moods} />
       </div>
     </div>

@@ -8,6 +8,14 @@ interface MoodCalendarProps {
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+const MOOD_DOT_COLORS: Record<string, string> = {
+  great: 'bg-mood-great',
+  good: 'bg-mood-good',
+  okay: 'bg-mood-okay',
+  bad: 'bg-mood-bad',
+  awful: 'bg-mood-awful',
+};
+
 const MoodCalendar = ({ moods }: MoodCalendarProps) => {
   const [viewDate, setViewDate] = useState(new Date());
 
@@ -18,13 +26,13 @@ const MoodCalendar = ({ moods }: MoodCalendarProps) => {
     const daysInMonth = new Date(y, m + 1, 0).getDate();
     const today = getDateKey(new Date());
 
-    const cells: { day: number; dateKey: string; emoji?: string; isToday: boolean }[] = [];
+    const cells: { day: number; dateKey: string; emoji?: string; moodType?: string; isToday: boolean }[] = [];
     for (let i = 0; i < firstDay; i++) cells.push({ day: 0, dateKey: '', isToday: false });
     for (let d = 1; d <= daysInMonth; d++) {
       const dateKey = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const entry = moods.find(e => e.date === dateKey);
       const moodDef = entry ? MOODS.find(m => m.type === entry.mood) : undefined;
-      cells.push({ day: d, dateKey, emoji: moodDef?.emoji, isToday: dateKey === today });
+      cells.push({ day: d, dateKey, emoji: moodDef?.emoji, moodType: entry?.mood, isToday: dateKey === today });
     }
     return { year: y, month: m, cells };
   }, [viewDate, moods]);
@@ -32,31 +40,33 @@ const MoodCalendar = ({ moods }: MoodCalendarProps) => {
   const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
+    <div className="card-3d gradient-bg-3 p-6">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={() => setViewDate(new Date(year, month - 1))} className="p-1.5 rounded-md hover:bg-accent transition-colors">
+        <button onClick={() => setViewDate(new Date(year, month - 1))} className="p-2 rounded-xl hover:bg-muted/60 transition-all hover:scale-110 active:scale-95">
           <ChevronLeft className="w-5 h-5 text-muted-foreground" />
         </button>
         <h2 className="text-lg font-bold text-foreground">{monthName} {year}</h2>
-        <button onClick={() => setViewDate(new Date(year, month + 1))} className="p-1.5 rounded-md hover:bg-accent transition-colors">
+        <button onClick={() => setViewDate(new Date(year, month + 1))} className="p-2 rounded-xl hover:bg-muted/60 transition-all hover:scale-110 active:scale-95">
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1">
         {DAYS.map(d => (
-          <div key={d} className="text-center text-xs font-semibold text-muted-foreground py-1">{d}</div>
+          <div key={d} className="text-center text-xs font-bold text-muted-foreground py-1.5">{d}</div>
         ))}
         {cells.map((cell, i) => (
           <div
             key={i}
-            className={`aspect-square flex flex-col items-center justify-center rounded-md text-sm transition-colors ${
-              cell.day === 0 ? '' : cell.isToday ? 'bg-primary/10 ring-2 ring-primary/30' : 'hover:bg-accent'
+            className={`aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-all duration-200 ${
+              cell.day === 0 ? '' : cell.isToday
+                ? 'bg-primary/15 ring-2 ring-primary/40 shadow-md'
+                : cell.emoji ? 'hover:scale-110 cursor-default' : 'hover:bg-muted/40'
             }`}
           >
             {cell.day > 0 && (
               <>
                 {cell.emoji ? (
-                  <span className="text-lg leading-none">{cell.emoji}</span>
+                  <span className="text-xl leading-none drop-shadow-sm">{cell.emoji}</span>
                 ) : (
                   <span className="text-muted-foreground text-xs">{cell.day}</span>
                 )}
