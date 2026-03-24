@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { MoodEntry, MOODS, MoodType } from '@/lib/moodStore';
+import { BarChart3 } from 'lucide-react';
 
 interface MoodAnalyticsProps {
   moods: MoodEntry[];
@@ -7,6 +8,14 @@ interface MoodAnalyticsProps {
 
 const MOOD_SCORES: Record<MoodType, number> = {
   great: 5, good: 4, okay: 3, bad: 2, awful: 1,
+};
+
+const BAR_COLORS: Record<MoodType, string> = {
+  great: 'from-emerald-400 to-teal-500',
+  good: 'from-cyan-400 to-sky-500',
+  okay: 'from-amber-400 to-yellow-500',
+  bad: 'from-orange-400 to-red-400',
+  awful: 'from-rose-400 to-pink-500',
 };
 
 const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
@@ -19,7 +28,6 @@ const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
     const avgScore = moods.reduce((sum, m) => sum + MOOD_SCORES[m.mood], 0) / moods.length;
     const topMood = (Object.entries(counts) as [MoodType, number][]).sort((a, b) => b[1] - a[1])[0];
 
-    // Streak calculation
     const sorted = [...moods].sort((a, b) => b.date.localeCompare(a.date));
     let streak = 0;
     const today = new Date();
@@ -36,8 +44,11 @@ const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
 
   if (!stats) {
     return (
-      <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
-        <h2 className="text-lg font-bold text-foreground mb-2">Mood Insights</h2>
+      <div className="card-3d gradient-bg-4 p-6">
+        <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-accent" />
+          Mood Insights
+        </h2>
         <p className="text-sm text-muted-foreground">Start checking in to see your mood analytics! 📊</p>
       </div>
     );
@@ -46,40 +57,41 @@ const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
   const topMoodDef = MOODS.find(m => m.type === stats.topMood[0]);
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
-      <h2 className="text-lg font-bold text-foreground mb-4">Mood Insights</h2>
+    <div className="card-3d gradient-bg-4 p-6">
+      <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+        <BarChart3 className="w-5 h-5 text-accent" />
+        Mood Insights
+      </h2>
 
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="bg-accent/60 rounded-lg p-3 text-center">
-          <p className="text-2xl font-extrabold text-foreground">{stats.streak}</p>
-          <p className="text-xs text-muted-foreground font-semibold">Day Streak 🔥</p>
-        </div>
-        <div className="bg-accent/60 rounded-lg p-3 text-center">
-          <p className="text-2xl font-extrabold text-foreground">{stats.avgScore.toFixed(1)}</p>
-          <p className="text-xs text-muted-foreground font-semibold">Avg Mood</p>
-        </div>
-        <div className="bg-accent/60 rounded-lg p-3 text-center">
-          <p className="text-2xl">{topMoodDef?.emoji}</p>
-          <p className="text-xs text-muted-foreground font-semibold">Most Common</p>
-        </div>
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        {[
+          { value: String(stats.streak), label: 'Day Streak 🔥', gradient: 'from-primary/15 to-accent/15' },
+          { value: stats.avgScore.toFixed(1), label: 'Avg Mood ⭐', gradient: 'from-secondary/15 to-primary/15' },
+          { value: topMoodDef?.emoji || '—', label: 'Most Common', gradient: 'from-accent/15 to-secondary/15' },
+        ].map(({ value, label, gradient }) => (
+          <div key={label} className={`bg-gradient-to-br ${gradient} rounded-2xl p-4 text-center shadow-sm border border-border/30 hover:shadow-md hover:-translate-y-0.5 transition-all`}>
+            <p className="text-2xl font-extrabold text-foreground">{value}</p>
+            <p className="text-xs text-muted-foreground font-bold mt-1">{label}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {MOODS.map(({ type, emoji, label }) => {
           const count = stats.counts[type];
           const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
           return (
-            <div key={type} className="flex items-center gap-2">
-              <span className="text-lg w-7 text-center">{emoji}</span>
+            <div key={type} className="flex items-center gap-3">
+              <span className="text-xl w-8 text-center drop-shadow-sm">{emoji}</span>
               <div className="flex-1">
-                <div className="w-full bg-muted rounded-full h-2.5">
+                <div className="w-full bg-muted/50 rounded-full h-3 overflow-hidden">
                   <div
-                    className={`h-2.5 rounded-full transition-all duration-700 bg-mood-${type}`}
+                    className={`h-3 rounded-full transition-all duration-1000 bg-gradient-to-r ${BAR_COLORS[type]}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
               </div>
-              <span className="text-xs font-semibold text-muted-foreground w-8 text-right">{count}</span>
+              <span className="text-xs font-bold text-muted-foreground w-8 text-right">{count}</span>
             </div>
           );
         })}
