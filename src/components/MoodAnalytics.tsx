@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { MoodEntry, MOODS, MoodType } from '@/lib/moodStore';
+import { MOOD_IMAGES } from '@/lib/moodImages';
 import { BarChart3 } from 'lucide-react';
 
 interface MoodAnalyticsProps {
@@ -67,22 +68,26 @@ const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
         {[
           { value: String(stats.streak), label: 'Day Streak 🔥', bg: 'bg-primary/8' },
           { value: stats.avgScore.toFixed(1), label: 'Avg Mood ⭐', bg: 'bg-secondary/8' },
-          { value: topMoodDef?.emoji || '—', label: 'Most Common', bg: 'bg-accent/8' },
-        ].map(({ value, label, bg }) => (
+          { value: topMoodDef ? 'img' : '—', label: 'Most Common', bg: 'bg-accent/8', imgSrc: topMoodDef ? MOOD_IMAGES[topMoodDef.type] : undefined },
+        ].map(({ value, label, bg, imgSrc }) => (
           <div key={label} className={`${bg} rounded-2xl p-4 text-center border border-border/30`}>
-            <p className="text-2xl font-bold text-foreground">{value}</p>
+            {imgSrc ? (
+              <img src={imgSrc} alt={label} width={32} height={32} className="w-8 h-8 mx-auto" />
+            ) : (
+              <p className="text-2xl font-bold text-foreground">{value}</p>
+            )}
             <p className="text-xs text-muted-foreground font-semibold mt-1">{label}</p>
           </div>
         ))}
       </div>
 
       <div className="space-y-3">
-        {MOODS.map(({ type, emoji }) => {
+        {MOODS.map(({ type }) => {
           const count = stats.counts[type];
           const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
           return (
             <div key={type} className="flex items-center gap-3">
-              <span className="text-xl w-8 text-center">{emoji}</span>
+              <img src={MOOD_IMAGES[type]} alt={type} width={28} height={28} className="w-7 h-7" />
               <div className="flex-1">
                 <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
                   <div

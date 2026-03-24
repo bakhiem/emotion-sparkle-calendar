@@ -1,4 +1,5 @@
 import { MOODS, MoodType } from '@/lib/moodStore';
+import { MOOD_IMAGES } from '@/lib/moodImages';
 
 interface MoodPickerProps {
   selected?: MoodType;
@@ -19,7 +20,7 @@ const MoodPicker = ({ selected, onSelect }: MoodPickerProps) => {
       <h2 className="text-lg font-bold text-foreground mb-1">How are you feeling? 🌿</h2>
       <p className="text-sm text-muted-foreground mb-5">Take a breath and tap what feels right</p>
       <div className="flex justify-center gap-3">
-        {MOODS.map(({ type, emoji, label }) => (
+        {MOODS.map(({ type, label }) => (
           <button
             key={type}
             onClick={() => onSelect(type)}
@@ -29,7 +30,7 @@ const MoodPicker = ({ selected, onSelect }: MoodPickerProps) => {
                 : 'hover:bg-muted/50 hover:scale-105'
             }`}
           >
-            <span className="text-4xl">{emoji}</span>
+            <img src={MOOD_IMAGES[type]} alt={label} width={48} height={48} className="w-12 h-12" />
             <span className={`text-xs font-semibold ${
               selected === type ? 'text-foreground' : 'text-muted-foreground'
             }`}>{label}</span>

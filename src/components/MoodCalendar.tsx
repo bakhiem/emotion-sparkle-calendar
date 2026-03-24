@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { MoodEntry, MOODS, getDateKey } from '@/lib/moodStore';
+import { MOOD_IMAGES } from '@/lib/moodImages';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MoodCalendarProps {
@@ -18,13 +19,12 @@ const MoodCalendar = ({ moods }: MoodCalendarProps) => {
     const daysInMonth = new Date(y, m + 1, 0).getDate();
     const today = getDateKey(new Date());
 
-    const cells: { day: number; dateKey: string; emoji?: string; isToday: boolean }[] = [];
+    const cells: { day: number; dateKey: string; moodType?: string; isToday: boolean }[] = [];
     for (let i = 0; i < firstDay; i++) cells.push({ day: 0, dateKey: '', isToday: false });
     for (let d = 1; d <= daysInMonth; d++) {
       const dateKey = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const entry = moods.find(e => e.date === dateKey);
-      const moodDef = entry ? MOODS.find(m => m.type === entry.mood) : undefined;
-      cells.push({ day: d, dateKey, emoji: moodDef?.emoji, isToday: dateKey === today });
+      cells.push({ day: d, dateKey, moodType: entry?.mood, isToday: dateKey === today });
     }
     return { year: y, month: m, cells };
   }, [viewDate, moods]);
@@ -52,12 +52,12 @@ const MoodCalendar = ({ moods }: MoodCalendarProps) => {
             className={`aspect-square flex items-center justify-center rounded-xl text-sm transition-colors ${
               cell.day === 0 ? '' : cell.isToday
                 ? 'bg-primary/12 ring-1 ring-primary/30'
-                : cell.emoji ? '' : 'hover:bg-muted/40'
+                : cell.moodType ? '' : 'hover:bg-muted/40'
             }`}
           >
             {cell.day > 0 && (
-              cell.emoji ? (
-                <span className="text-xl leading-none">{cell.emoji}</span>
+              cell.moodType ? (
+                <img src={MOOD_IMAGES[cell.moodType as keyof typeof MOOD_IMAGES]} alt={cell.moodType} width={28} height={28} className="w-7 h-7" />
               ) : (
                 <span className="text-muted-foreground text-xs">{cell.day}</span>
               )
