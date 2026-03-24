@@ -69,9 +69,13 @@ const MoodAnalytics = ({ moods }: MoodAnalyticsProps) => {
           { value: String(stats.streak), label: 'Day Streak 🔥', bg: 'bg-primary/8' },
           { value: stats.avgScore.toFixed(1), label: 'Avg Mood ⭐', bg: 'bg-secondary/8' },
           { value: topMoodDef ? 'img' : '—', label: 'Most Common', bg: 'bg-accent/8', imgSrc: topMoodDef ? MOOD_IMAGES[topMoodDef.type] : undefined },
-        ].map(({ value, label, bg }) => (
+        ].map(({ value, label, bg, imgSrc }) => (
           <div key={label} className={`${bg} rounded-2xl p-4 text-center border border-border/30`}>
-            <p className="text-2xl font-bold text-foreground">{value}</p>
+            {imgSrc ? (
+              <img src={imgSrc} alt={label} width={32} height={32} className="w-8 h-8 mx-auto" />
+            ) : (
+              <p className="text-2xl font-bold text-foreground">{value}</p>
+            )}
             <p className="text-xs text-muted-foreground font-semibold mt-1">{label}</p>
           </div>
         ))}
