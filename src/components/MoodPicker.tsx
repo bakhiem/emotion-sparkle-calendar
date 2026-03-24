@@ -5,43 +5,41 @@ interface MoodPickerProps {
   onSelect: (mood: MoodType) => void;
 }
 
-const MOOD_PASTEL: Record<MoodType, string> = {
-  great: 'bg-[hsl(160_45%_85%)] border-mood-great/40',
-  good: 'bg-[hsl(200_55%_88%)] border-mood-good/40',
-  okay: 'bg-[hsl(50_60%_88%)] border-mood-okay/40',
-  bad: 'bg-[hsl(20_70%_88%)] border-mood-bad/40',
-  awful: 'bg-[hsl(340_60%_88%)] border-mood-awful/40',
+const MOOD_RING: Record<MoodType, string> = {
+  great: 'ring-mood-great/50 bg-mood-great/10',
+  good: 'ring-mood-good/50 bg-mood-good/10',
+  okay: 'ring-mood-okay/50 bg-mood-okay/10',
+  bad: 'ring-mood-bad/50 bg-mood-bad/10',
+  awful: 'ring-mood-awful/50 bg-mood-awful/10',
 };
 
 const MoodPicker = ({ selected, onSelect }: MoodPickerProps) => {
   return (
-    <div className="cute-card">
-      <p className="text-center text-sm font-bold text-foreground mb-1" style={{ fontFamily: "'Baloo 2', cursive" }}>
-        How's your kitty feeling? ✨
-      </p>
-      <p className="text-center text-xs text-muted-foreground mb-4">pick one ~</p>
-      <div className="flex justify-center gap-2">
+    <div className="nature-card">
+      <h2 className="text-lg font-bold text-foreground mb-1">How are you feeling? 🌿</h2>
+      <p className="text-sm text-muted-foreground mb-5">Take a breath and tap what feels right</p>
+      <div className="flex justify-center gap-3">
         {MOODS.map(({ type, emoji, label }) => (
           <button
             key={type}
             onClick={() => onSelect(type)}
-            className={`flex flex-col items-center gap-1 p-2.5 rounded-2xl transition-all duration-200 border-2 ${
+            className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all duration-300 ${
               selected === type
-                ? `${MOOD_PASTEL[type]} scale-110 animate-mood-pop`
-                : 'border-transparent hover:bg-muted/50 hover:scale-105'
+                ? `ring-2 ${MOOD_RING[type]} scale-110 animate-mood-pop`
+                : 'hover:bg-muted/50 hover:scale-105'
             }`}
           >
-            <span className="text-3xl">{emoji}</span>
-            <span className={`text-[10px] font-bold ${
+            <span className="text-4xl">{emoji}</span>
+            <span className={`text-xs font-semibold ${
               selected === type ? 'text-foreground' : 'text-muted-foreground'
             }`}>{label}</span>
           </button>
         ))}
       </div>
       {selected && (
-        <div className="mt-3 text-center">
-          <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-xs font-bold text-primary">
-            {selected} day~ ♡
+        <div className="mt-4 text-center">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-sm font-semibold text-primary">
+            Feeling {selected} today 🍃
           </span>
         </div>
       )}
