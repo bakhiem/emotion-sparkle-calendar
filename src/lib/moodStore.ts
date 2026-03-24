@@ -14,11 +14,11 @@ export interface TaskEntry {
 }
 
 export const MOODS: { type: MoodType; emoji: string; label: string }[] = [
-  { type: 'great', emoji: '😄', label: 'Great' },
-  { type: 'good', emoji: '🙂', label: 'Good' },
-  { type: 'okay', emoji: '😐', label: 'Okay' },
-  { type: 'bad', emoji: '😟', label: 'Bad' },
-  { type: 'awful', emoji: '😢', label: 'Awful' },
+  { type: 'great', emoji: '😻', label: 'Great' },
+  { type: 'good', emoji: '😺', label: 'Good' },
+  { type: 'okay', emoji: '🐱', label: 'Okay' },
+  { type: 'bad', emoji: '🙀', label: 'Bad' },
+  { type: 'awful', emoji: '😿', label: 'Awful' },
 ];
 
 const MOOD_STORAGE_KEY = 'moodflow-moods';
