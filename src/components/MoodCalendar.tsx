@@ -19,13 +19,12 @@ const MoodCalendar = ({ moods }: MoodCalendarProps) => {
     const daysInMonth = new Date(y, m + 1, 0).getDate();
     const today = getDateKey(new Date());
 
-    const cells: { day: number; dateKey: string; emoji?: string; isToday: boolean }[] = [];
+    const cells: { day: number; dateKey: string; moodType?: string; isToday: boolean }[] = [];
     for (let i = 0; i < firstDay; i++) cells.push({ day: 0, dateKey: '', isToday: false });
     for (let d = 1; d <= daysInMonth; d++) {
       const dateKey = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const entry = moods.find(e => e.date === dateKey);
-      const moodDef = entry ? MOODS.find(m => m.type === entry.mood) : undefined;
-      cells.push({ day: d, dateKey, emoji: moodDef?.emoji, isToday: dateKey === today });
+      cells.push({ day: d, dateKey, moodType: entry?.mood, isToday: dateKey === today });
     }
     return { year: y, month: m, cells };
   }, [viewDate, moods]);
