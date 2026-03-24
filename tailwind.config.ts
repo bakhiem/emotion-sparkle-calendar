@@ -13,7 +13,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Quicksand', 'Comfortaa', 'sans-serif'],
+        sans: ['"Nunito Sans"', 'sans-serif'],
+        display: ['"Baloo 2"', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -83,14 +84,14 @@ export default {
         },
         "mood-pop": {
           "0%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.2)" },
+          "50%": { transform: "scale(1.15)" },
           "100%": { transform: "scale(1)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "mood-pop": "mood-pop 0.3s ease-out",
+        "mood-pop": "mood-pop 0.25s ease-out",
       },
     },
   },
