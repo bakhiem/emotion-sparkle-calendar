@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
-import MoodPicker from '@/components/MoodPicker';
+import { useState, useCallback, useEffect } from 'react';
 import MoodCalendar from '@/components/MoodCalendar';
 import DailyTasks from '@/components/DailyTasks';
 import MoodAnalytics from '@/components/MoodAnalytics';
+import MoodCheckInDialog from '@/components/MoodCheckInDialog';
+import BottomTabs from '@/components/BottomTabs';
 import {
   MoodEntry, MoodType, TaskEntry,
   getDateKey, loadMoods, saveMood, loadTasks, saveTasks,
@@ -12,9 +13,18 @@ const Index = () => {
   const today = getDateKey(new Date());
   const [moods, setMoods] = useState<MoodEntry[]>(loadMoods);
   const [tasks, setTasks] = useState<TaskEntry[]>(loadTasks);
+  const [activeTab, setActiveTab] = useState<'home' | 'insights'>('home');
+  const [checkInOpen, setCheckInOpen] = useState(false);
 
   const todayMood = moods.find(m => m.date === today)?.mood;
   const todayTasks = tasks.filter(t => t.date === today);
+
+  // Auto-show check-in popup if no mood logged today
+  useEffect(() => {
+    if (!todayMood) {
+      setCheckInOpen(true);
+    }
+  }, []);
 
   const handleMoodSelect = useCallback((mood: MoodType) => {
     const updated = saveMood({ date: today, mood });
@@ -38,6 +48,10 @@ const Index = () => {
     });
   }, [today]);
 
+  const handleTodayClick = useCallback(() => {
+    setCheckInOpen(true);
+  }, []);
+
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return 'Good morning ☀️';
@@ -46,23 +60,36 @@ const Index = () => {
   })();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-lg mx-auto px-4 py-8 space-y-5">
+    <div className="min-h-screen bg-background pb-20">
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
         {/* Header */}
-        <div className="text-center py-4">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">
-            🌿 MoodFlow
-          </h1>
-          <p className="text-muted-foreground text-sm mt-2 font-medium">
+        <div className="text-center py-3">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">🌿 MoodFlow</h1>
+          <p className="text-muted-foreground text-sm mt-1 font-medium">
             {greeting} — {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
-        <MoodPicker selected={todayMood} onSelect={handleMoodSelect} />
-        <DailyTasks tasks={todayTasks} onToggle={handleToggleTask} onAdd={handleAddTask} />
-        <MoodCalendar moods={moods} />
-        <MoodAnalytics moods={moods} />
+        {activeTab === 'home' && (
+          <>
+            <MoodCalendar moods={moods} onTodayClick={handleTodayClick} />
+            <DailyTasks tasks={todayTasks} onToggle={handleToggleTask} onAdd={handleAddTask} />
+          </>
+        )}
+
+        {activeTab === 'insights' && (
+          <MoodAnalytics moods={moods} />
+        )}
       </div>
+
+      <MoodCheckInDialog
+        open={checkInOpen}
+        onOpenChange={setCheckInOpen}
+        selected={todayMood}
+        onSelect={handleMoodSelect}
+      />
+
+      <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };

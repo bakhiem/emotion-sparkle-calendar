@@ -1,15 +1,16 @@
 import { useState, useMemo } from 'react';
-import { MoodEntry, MOODS, getDateKey } from '@/lib/moodStore';
+import { MoodEntry, getDateKey } from '@/lib/moodStore';
 import { MOOD_IMAGES } from '@/lib/moodImages';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MoodCalendarProps {
   moods: MoodEntry[];
+  onTodayClick?: () => void;
 }
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const MoodCalendar = ({ moods }: MoodCalendarProps) => {
+const MoodCalendar = ({ moods, onTodayClick }: MoodCalendarProps) => {
   const [viewDate, setViewDate] = useState(new Date());
 
   const { year, month, cells } = useMemo(() => {
@@ -49,15 +50,23 @@ const MoodCalendar = ({ moods }: MoodCalendarProps) => {
         {cells.map((cell, i) => (
           <div
             key={i}
+            onClick={() => cell.isToday && onTodayClick?.()}
             className={`aspect-square flex items-center justify-center rounded-xl text-sm transition-colors ${
               cell.day === 0 ? '' : cell.isToday
-                ? 'bg-primary/12 ring-1 ring-primary/30'
+                ? 'bg-primary/12 ring-1 ring-primary/30 cursor-pointer hover:bg-primary/20'
                 : cell.moodType ? '' : 'hover:bg-muted/40'
             }`}
           >
             {cell.day > 0 && (
               cell.moodType ? (
-                <img src={MOOD_IMAGES[cell.moodType as keyof typeof MOOD_IMAGES]} alt={cell.moodType} width={28} height={28} className="w-7 h-7" />
+                <img
+                  src={MOOD_IMAGES[cell.moodType as keyof typeof MOOD_IMAGES]}
+                  alt={cell.moodType}
+                  width={28}
+                  height={28}
+                  className={`w-7 h-7 ${cell.isToday ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
+                  onClick={cell.isToday ? onTodayClick : undefined}
+                />
               ) : (
                 <span className="text-muted-foreground text-xs">{cell.day}</span>
               )
