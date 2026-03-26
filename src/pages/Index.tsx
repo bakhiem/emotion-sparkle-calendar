@@ -3,7 +3,10 @@ import MoodCalendar from '@/components/MoodCalendar';
 import DailyTasks from '@/components/DailyTasks';
 import MoodAnalytics from '@/components/MoodAnalytics';
 import MoodCheckInDialog from '@/components/MoodCheckInDialog';
-import BottomTabs from '@/components/BottomTabs';
+import SettingsPage from '@/components/SettingsPage';
+import BottomTabs, { TabType } from '@/components/BottomTabs';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import {
   MoodEntry, MoodType, TaskEntry,
   getDateKey, loadMoods, saveMood, loadTasks, saveTasks,
@@ -11,10 +14,12 @@ import {
 
 const Index = () => {
   const today = getDateKey(new Date());
+  const { user } = useAuth();
   const [moods, setMoods] = useState<MoodEntry[]>(loadMoods);
   const [tasks, setTasks] = useState<TaskEntry[]>(loadTasks);
-  const [activeTab, setActiveTab] = useState<'home' | 'insights'>('home');
+  const [activeTab, setActiveTab] = useState<TabType>('home');
   const [checkInOpen, setCheckInOpen] = useState(false);
+  const [defaultTasksPopulated, setDefaultTasksPopulated] = useState(false);
 
   const todayMood = moods.find(m => m.date === today)?.mood;
   const todayTasks = tasks.filter(t => t.date === today);
@@ -25,6 +30,31 @@ const Index = () => {
       setCheckInOpen(true);
     }
   }, []);
+
+  // Auto-populate default tasks for today (logged-in users)
+  useEffect(() => {
+    if (!user || defaultTasksPopulated) return;
+    const populateDefaults = async () => {
+      const { data: defaults } = await supabase.from('default_tasks')
+        .select('text').eq('user_id', user.id);
+      if (!defaults || defaults.length === 0) return;
+
+      const existingTexts = new Set(todayTasks.map(t => t.text));
+      const newTasks: TaskEntry[] = defaults
+        .filter(d => !existingTexts.has(d.text))
+        .map(d => ({ id: crypto.randomUUID(), date: today, text: d.text, completed: false }));
+
+      if (newTasks.length > 0) {
+        setTasks(prev => {
+          const updated = [...prev, ...newTasks];
+          saveTasks(updated);
+          return updated;
+        });
+      }
+      setDefaultTasksPopulated(true);
+    };
+    populateDefaults();
+  }, [user, today, defaultTasksPopulated]);
 
   const handleMoodSelect = useCallback((mood: MoodType) => {
     const updated = saveMood({ date: today, mood });
@@ -79,6 +109,10 @@ const Index = () => {
 
         {activeTab === 'insights' && (
           <MoodAnalytics moods={moods} />
+        )}
+
+        {activeTab === 'settings' && (
+          <SettingsPage />
         )}
       </div>
 

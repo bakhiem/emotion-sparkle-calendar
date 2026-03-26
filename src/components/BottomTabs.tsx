@@ -1,14 +1,17 @@
-import { CalendarDays, BarChart3 } from 'lucide-react';
+import { CalendarDays, BarChart3, Settings } from 'lucide-react';
+
+export type TabType = 'home' | 'insights' | 'settings';
 
 interface BottomTabsProps {
-  activeTab: 'home' | 'insights';
-  onTabChange: (tab: 'home' | 'insights') => void;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }
 
 const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
   const tabs = [
     { id: 'home' as const, label: 'Home', icon: CalendarDays },
     { id: 'insights' as const, label: 'Insights', icon: BarChart3 },
+    { id: 'settings' as const, label: 'Settings', icon: Settings },
   ];
 
   return (
