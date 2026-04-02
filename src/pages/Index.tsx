@@ -19,8 +19,6 @@ const Index = () => {
   const [tasks, setTasks] = useState<TaskEntry[]>(loadTasks);
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [checkInOpen, setCheckInOpen] = useState(false);
-  const [defaultTasksPopulated, setDefaultTasksPopulated] = useState(false);
-
   const todayMood = moods.find(m => m.date === today)?.mood;
   const todayTasks = tasks.filter(t => t.date === today);
 
@@ -31,30 +29,31 @@ const Index = () => {
     }
   }, []);
 
-  // Auto-populate default tasks for today (logged-in users)
+  // Auto-populate default tasks when switching to home tab or on mount
   useEffect(() => {
-    if (!user || defaultTasksPopulated) return;
+    if (!user || activeTab !== 'home') return;
     const populateDefaults = async () => {
       const { data: defaults } = await supabase.from('default_tasks')
         .select('text').eq('user_id', user.id);
       if (!defaults || defaults.length === 0) return;
 
-      const existingTexts = new Set(todayTasks.map(t => t.text));
-      const newTasks: TaskEntry[] = defaults
-        .filter(d => !existingTexts.has(d.text))
-        .map(d => ({ id: crypto.randomUUID(), date: today, text: d.text, completed: false }));
+      setTasks(prev => {
+        const todayExisting = prev.filter(t => t.date === today);
+        const existingTexts = new Set(todayExisting.map(t => t.text));
+        const newTasks: TaskEntry[] = defaults
+          .filter(d => !existingTexts.has(d.text))
+          .map(d => ({ id: crypto.randomUUID(), date: today, text: d.text, completed: false }));
 
-      if (newTasks.length > 0) {
-        setTasks(prev => {
+        if (newTasks.length > 0) {
           const updated = [...prev, ...newTasks];
           saveTasks(updated);
           return updated;
-        });
-      }
-      setDefaultTasksPopulated(true);
+        }
+        return prev;
+      });
     };
     populateDefaults();
-  }, [user, today, defaultTasksPopulated]);
+  }, [user, today, activeTab]);
 
   const handleMoodSelect = useCallback((mood: MoodType) => {
     const updated = saveMood({ date: today, mood });
