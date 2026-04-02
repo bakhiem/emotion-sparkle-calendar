@@ -21,7 +21,7 @@ const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
           <button
             key={id}
             onClick={() => onTabChange(id)}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 px-4 transition-all duration-200 ${
+            className={`relative flex-1 flex flex-col items-center gap-1 py-3 px-4 transition-all duration-200 ${
               activeTab === id
                 ? 'text-primary'
                 : 'text-muted-foreground hover:text-foreground'
