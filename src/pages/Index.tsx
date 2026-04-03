@@ -3,6 +3,7 @@ import MoodCalendar from '@/components/MoodCalendar';
 import DailyTasks from '@/components/DailyTasks';
 import MoodAnalytics from '@/components/MoodAnalytics';
 import MoodCheckInDialog from '@/components/MoodCheckInDialog';
+import MoodCompanion from '@/components/MoodCompanion';
 import SettingsPage from '@/components/SettingsPage';
 import BottomTabs, { TabType } from '@/components/BottomTabs';
 import { useAuth } from '@/hooks/useAuth';
