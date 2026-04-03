@@ -124,6 +124,7 @@ const Index = () => {
         onSelect={handleMoodSelect}
       />
 
+      <MoodCompanion todayMood={todayMood} moods={moods} todayTasks={todayTasks} />
       <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
