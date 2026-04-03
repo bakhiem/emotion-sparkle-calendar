@@ -17,36 +17,22 @@ serve(async (req) => {
 
     const moodSummary = recentMoods && recentMoods.length > 0
       ? `Recent moods (last 7 days): ${recentMoods.map((m: { date: string; mood: string }) => `${m.date}: ${m.mood}`).join(", ")}`
-      : "No recent mood data available.";
+      : "No recent mood data.";
 
     const taskSummary = totalTasks > 0
-      ? `Today's tasks: ${completedTasks}/${totalTasks} completed.`
-      : "No tasks for today.";
+      ? `Tasks: ${completedTasks}/${totalTasks} done.`
+      : "";
 
-    const systemPrompt = `You are MoodFlow's AI companion — a warm, empathetic wellness buddy embedded in a mood tracking app. Your personality is like a caring friend who happens to know a lot about wellness.
+    const systemPrompt = `You are a warm wellness companion in a mood tracking app. Reply with EXACTLY ONE short sentence (max 20 words). It can be:
+- A specific song recommendation (include artist name)
+- A quick meditation tip
+- An inspiring quote
+- A congratulation if they've been doing well
+- A gentle encouragement if they're feeling down
 
-Your job is to provide a SHORT, personalized response based on the user's mood data. Keep it to 2-3 short paragraphs max.
+Match the tone to their mood. Be specific, warm, and brief. No emoji headers, no sections, no formatting — just one plain sentence.`;
 
-Response format — include ALL of these sections using these exact emoji headers:
-💭 **Thought** — A brief empathetic reflection on their mood (1-2 sentences)
-🎵 **Try This** — One specific recommendation: a song, meditation, breathing exercise, podcast, or activity (be specific with names/titles)
-🌟 **Quote** — One inspiring or comforting quote relevant to their emotional state
-
-Guidelines:
-- If mood is "great" or "good": celebrate, suggest uplifting activities to maintain the vibe
-- If mood is "okay": gentle encouragement, suggest something energizing or calming
-- If mood is "bad" or "awful": be extra compassionate, suggest calming/healing activities (meditation, specific soothing songs, breathing exercises)
-- If they've had a streak of good days: congratulate them enthusiastically!
-- If tasks completion is high: acknowledge their productivity
-- Keep recommendations SPECIFIC (e.g. "Listen to 'Weightless' by Marconi Union" not just "listen to calming music")
-- Use a warm, friendly tone — not clinical
-- Response must be concise — no more than 150 words total`;
-
-    const userMessage = `Today's mood: ${todayMood || "not checked in yet"}
-${moodSummary}
-${taskSummary}
-
-Please give me a personalized wellness insight.`;
+    const userMessage = `Mood: ${todayMood || "unknown"}. ${moodSummary} ${taskSummary}`.trim();
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -65,22 +51,20 @@ Please give me a personalized wellness insight.`;
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), {
+        return new Response(JSON.stringify({ error: "Rate limited" }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
+        return new Response(JSON.stringify({ error: "Credits exhausted" }), {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
       throw new Error("AI gateway error");
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "Take a deep breath 🌿 You're doing great.";
+    const content = data.choices?.[0]?.message?.content || "Take a deep breath — you're doing great.";
 
     return new Response(JSON.stringify({ message: content }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
