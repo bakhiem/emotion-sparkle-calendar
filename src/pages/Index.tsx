@@ -102,11 +102,11 @@ const Index = () => {
 
         {activeTab === 'home' && (
           <>
-            <MoodCompanion todayMood={todayMood} moods={moods} todayTasks={todayTasks} />
             <MoodCalendar moods={moods} onTodayClick={handleTodayClick} />
             <DailyTasks tasks={todayTasks} onToggle={handleToggleTask} onAdd={handleAddTask} />
           </>
         )}
+
 
         {activeTab === 'insights' && (
           <MoodAnalytics moods={moods} />
