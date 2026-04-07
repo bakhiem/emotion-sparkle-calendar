@@ -4,6 +4,9 @@ import DailyTasks from '@/components/DailyTasks';
 import MoodAnalytics from '@/components/MoodAnalytics';
 import MoodCheckInDialog from '@/components/MoodCheckInDialog';
 import MoodCompanion from '@/components/MoodCompanion';
+import AiActivitySuggestions from '@/components/AiActivitySuggestions';
+import AiTrendAnalysis from '@/components/AiTrendAnalysis';
+import AiWeeklyJournal from '@/components/AiWeeklyJournal';
 import SettingsPage from '@/components/SettingsPage';
 import BottomTabs, { TabType } from '@/components/BottomTabs';
 import { useAuth } from '@/hooks/useAuth';
@@ -103,13 +106,18 @@ const Index = () => {
         {activeTab === 'home' && (
           <>
             <MoodCalendar moods={moods} onTodayClick={handleTodayClick} />
+            <AiActivitySuggestions todayMood={todayMood} moods={moods} />
             <DailyTasks tasks={todayTasks} onToggle={handleToggleTask} onAdd={handleAddTask} />
           </>
         )}
 
 
         {activeTab === 'insights' && (
-          <MoodAnalytics moods={moods} />
+          <>
+            <MoodAnalytics moods={moods} />
+            <AiTrendAnalysis moods={moods} />
+            <AiWeeklyJournal moods={moods} tasks={tasks} />
+          </>
         )}
 
         {activeTab === 'settings' && (
