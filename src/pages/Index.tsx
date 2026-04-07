@@ -106,6 +106,7 @@ const Index = () => {
         {activeTab === 'home' && (
           <>
             <MoodCalendar moods={moods} onTodayClick={handleTodayClick} />
+            <AiActivitySuggestions todayMood={todayMood} moods={moods} />
             <DailyTasks tasks={todayTasks} onToggle={handleToggleTask} onAdd={handleAddTask} />
           </>
         )}
