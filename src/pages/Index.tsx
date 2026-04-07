@@ -112,7 +112,11 @@ const Index = () => {
 
 
         {activeTab === 'insights' && (
-          <MoodAnalytics moods={moods} />
+          <>
+            <MoodAnalytics moods={moods} />
+            <AiTrendAnalysis moods={moods} />
+            <AiWeeklyJournal moods={moods} tasks={tasks} />
+          </>
         )}
 
         {activeTab === 'settings' && (
