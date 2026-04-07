@@ -34,14 +34,13 @@ Keep it warm, specific, and under 60 words total. Use their actual data.`;
       
       userMessage = `Mood entries: ${JSON.stringify(moods)}. Tasks completed: ${JSON.stringify(tasks)}`;
     } else if (type === "activity-suggestions") {
-      systemPrompt = `You are a wellness companion. Based on the user's current mood, suggest specific activities in this EXACT format:
+      systemPrompt = `You are a wellness companion in a mood tracking app. Based on the user's mood, give EXACTLY ONE short suggestion. Randomly pick ONE of these types:
+- A specific song recommendation (song name + artist)
+- An inspiring quote (with author)
+- A quick mindfulness tip (one sentence)
+- A fun micro-activity
 
-🎵 **Music**: [Specific song - Artist name]
-🧘 **Mindfulness**: [Specific 1-2 minute exercise]
-📝 **Activity**: [One specific thing to do right now]
-🌿 **Self-care**: [One small self-care action]
-
-Be very specific (real song names, real exercises). Keep each suggestion under 15 words. Match intensity to their mood.`;
+Max 20 words. No emoji headers, no formatting, no labels — just the suggestion itself. Be specific and warm.`;
 
       userMessage = `Current mood: ${moods.current}. Recent pattern: ${moods.recent}`;
     } else if (type === "weekly-journal") {
