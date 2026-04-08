@@ -62,6 +62,36 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_entries: {
+        Row: {
+          answers: Json
+          created_at: string
+          date: string
+          id: string
+          questions: Json
+          summary: string | null
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          date: string
+          id?: string
+          questions?: Json
+          summary?: string | null
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          date?: string
+          id?: string
+          questions?: Json
+          summary?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       mood_entries: {
         Row: {
           created_at: string
