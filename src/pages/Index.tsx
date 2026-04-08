@@ -3,10 +3,9 @@ import MoodCalendar from '@/components/MoodCalendar';
 import DailyTasks from '@/components/DailyTasks';
 import MoodAnalytics from '@/components/MoodAnalytics';
 import MoodCheckInDialog from '@/components/MoodCheckInDialog';
-import MoodCompanion from '@/components/MoodCompanion';
-import AiActivitySuggestions from '@/components/AiActivitySuggestions';
+import AiDailyCoach from '@/components/AiDailyCoach';
 import AiTrendAnalysis from '@/components/AiTrendAnalysis';
-import AiWeeklyJournal from '@/components/AiWeeklyJournal';
+import AiGuidedJournal from '@/components/AiGuidedJournal';
 import SettingsPage from '@/components/SettingsPage';
 import BottomTabs, { TabType } from '@/components/BottomTabs';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,28 +25,22 @@ const Index = () => {
   const todayMood = moods.find(m => m.date === today)?.mood;
   const todayTasks = tasks.filter(t => t.date === today);
 
-  // Auto-show check-in popup if no mood logged today
   useEffect(() => {
-    if (!todayMood) {
-      setCheckInOpen(true);
-    }
+    if (!todayMood) setCheckInOpen(true);
   }, []);
 
-  // Auto-populate default tasks when switching to home tab or on mount
   useEffect(() => {
     if (!user || activeTab !== 'home') return;
     const populateDefaults = async () => {
       const { data: defaults } = await supabase.from('default_tasks')
         .select('text').eq('user_id', user.id);
       if (!defaults || defaults.length === 0) return;
-
       setTasks(prev => {
         const todayExisting = prev.filter(t => t.date === today);
         const existingTexts = new Set(todayExisting.map(t => t.text));
         const newTasks: TaskEntry[] = defaults
           .filter(d => !existingTexts.has(d.text))
           .map(d => ({ id: crypto.randomUUID(), date: today, text: d.text, completed: false }));
-
         if (newTasks.length > 0) {
           const updated = [...prev, ...newTasks];
           saveTasks(updated);
@@ -81,9 +74,7 @@ const Index = () => {
     });
   }, [today]);
 
-  const handleTodayClick = useCallback(() => {
-    setCheckInOpen(true);
-  }, []);
+  const handleTodayClick = useCallback(() => setCheckInOpen(true), []);
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -95,7 +86,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
-        {/* Header */}
         <div className="text-center py-3">
           <h1 className="text-2xl font-bold text-foreground tracking-tight">🌿 MoodFlow</h1>
           <p className="text-muted-foreground text-sm mt-1 font-medium">
@@ -106,23 +96,20 @@ const Index = () => {
         {activeTab === 'home' && (
           <>
             <MoodCalendar moods={moods} onTodayClick={handleTodayClick} />
-            <AiActivitySuggestions todayMood={todayMood} moods={moods} />
+            <AiDailyCoach todayMood={todayMood} moods={moods} todayTasks={todayTasks} />
             <DailyTasks tasks={todayTasks} onToggle={handleToggleTask} onAdd={handleAddTask} />
           </>
         )}
-
 
         {activeTab === 'insights' && (
           <>
             <MoodAnalytics moods={moods} />
             <AiTrendAnalysis moods={moods} />
-            <AiWeeklyJournal moods={moods} tasks={tasks} />
+            <AiGuidedJournal moods={moods} tasks={tasks} />
           </>
         )}
 
-        {activeTab === 'settings' && (
-          <SettingsPage />
-        )}
+        {activeTab === 'settings' && <SettingsPage />}
       </div>
 
       <MoodCheckInDialog
@@ -132,7 +119,6 @@ const Index = () => {
         onSelect={handleMoodSelect}
       />
 
-      <MoodCompanion todayMood={todayMood} moods={moods} todayTasks={todayTasks} />
       <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
