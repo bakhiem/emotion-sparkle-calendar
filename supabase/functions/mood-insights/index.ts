@@ -24,7 +24,7 @@ serve(async (req) => {
     let tool_choice: any | undefined;
 
     if (type === "daily-coach") {
-      systemPrompt = `You are a warm, personal wellness coach in a mood tracking app. Based on the user's mood data, create a personalized daily message and one mini challenge. Be specific, warm, and reference their actual patterns. Speak naturally like a caring friend.`;
+      systemPrompt = `You are a warm, personal wellness coach in a mood tracking app. Based on the user's mood data, create a personalized daily message and one mini challenge. Be specific, warm, and reference their actual patterns. Speak naturally like a caring friend. ${langInstruction}`;
       userMessage = `Today's mood: ${moods.current || "not set yet"}. Last 7 days moods: ${JSON.stringify(moods.recent)}. Tasks completed today: ${tasks?.completed || 0}/${tasks?.total || 0}.`;
       tools = [{
         type: "function",
