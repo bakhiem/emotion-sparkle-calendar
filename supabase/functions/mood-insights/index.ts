@@ -10,7 +10,10 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { type, moods, tasks, answers } = await req.json();
+    const { type, moods, tasks, answers, lang } = await req.json();
+    const langInstruction = lang === 'en' 
+      ? 'Respond in English.' 
+      : 'Respond in Vietnamese (tiếng Việt).';
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -21,7 +24,7 @@ serve(async (req) => {
     let tool_choice: any | undefined;
 
     if (type === "daily-coach") {
-      systemPrompt = `You are a warm, personal wellness coach in a mood tracking app. Based on the user's mood data, create a personalized daily message and one mini challenge. Be specific, warm, and reference their actual patterns. Speak naturally like a caring friend.`;
+      systemPrompt = `You are a warm, personal wellness coach in a mood tracking app. Based on the user's mood data, create a personalized daily message and one mini challenge. Be specific, warm, and reference their actual patterns. Speak naturally like a caring friend. ${langInstruction}`;
       userMessage = `Today's mood: ${moods.current || "not set yet"}. Last 7 days moods: ${JSON.stringify(moods.recent)}. Tasks completed today: ${tasks?.completed || 0}/${tasks?.total || 0}.`;
       tools = [{
         type: "function",
@@ -43,7 +46,7 @@ serve(async (req) => {
       tool_choice = { type: "function", function: { name: "daily_coach_response" } };
 
     } else if (type === "journal-questions") {
-      systemPrompt = `You are a reflective wellness journaler. Based on the user's mood data from this week, generate 2-3 thoughtful, open-ended questions to help them reflect. Reference specific days and moods when possible. Questions should be warm, non-judgmental, and encourage self-reflection. Write in the user's perspective.`;
+      systemPrompt = `You are a reflective wellness journaler. Based on the user's mood data from this week, generate 2-3 thoughtful, open-ended questions to help them reflect. Reference specific days and moods when possible. Questions should be warm, non-judgmental, and encourage self-reflection. Write in the user's perspective. ${langInstruction}`;
       userMessage = `This week's moods: ${JSON.stringify(moods)}. Tasks: ${JSON.stringify(tasks)}`;
       tools = [{
         type: "function",
@@ -67,7 +70,7 @@ serve(async (req) => {
       tool_choice = { type: "function", function: { name: "journal_questions" } };
 
     } else if (type === "journal-summary") {
-      systemPrompt = `You are a compassionate wellness journaler. The user answered some reflective questions about their week. Combine their answers with their mood data to write a beautiful, warm journal summary. Write it as if it's their personal diary entry. Keep it under 100 words, poetic but genuine.`;
+      systemPrompt = `You are a compassionate wellness journaler. The user answered some reflective questions about their week. Combine their answers with their mood data to write a beautiful, warm journal summary. Write it as if it's their personal diary entry. Keep it under 100 words, poetic but genuine. ${langInstruction}`;
       userMessage = `Mood data: ${JSON.stringify(moods)}. Questions and answers: ${JSON.stringify(answers)}`;
 
     } else if (type === "trend-analysis") {
@@ -82,15 +85,15 @@ serve(async (req) => {
 **🎯 Focus Area**
 [One specific thing they could try this week]
 
-Keep it warm, specific, and under 60 words total. Use their actual data.`;
+Keep it warm, specific, and under 60 words total. Use their actual data. ${langInstruction}`;
       userMessage = `Mood entries: ${JSON.stringify(moods)}. Tasks completed: ${JSON.stringify(tasks)}`;
 
     } else if (type === "activity-suggestions") {
-      systemPrompt = `You are a wellness companion. Based on the user's mood, give ONE short suggestion. Max 20 words. No formatting. Be specific and warm.`;
+      systemPrompt = `You are a wellness companion. Based on the user's mood, give ONE short suggestion. Max 20 words. No formatting. Be specific and warm. ${langInstruction}`;
       userMessage = `Current mood: ${moods.current}. Recent pattern: ${moods.recent}`;
 
     } else if (type === "weekly-journal") {
-      systemPrompt = `You are a reflective wellness journaler. Write a brief, warm weekly emotional summary. Keep it personal, warm, and under 80 words total.`;
+      systemPrompt = `You are a reflective wellness journaler. Write a brief, warm weekly emotional summary. Keep it personal, warm, and under 80 words total. ${langInstruction}`;
       userMessage = `This week's moods: ${JSON.stringify(moods)}. Tasks: ${JSON.stringify(tasks)}`;
 
     } else {

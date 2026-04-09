@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MoodEntry, getDateKey } from '@/lib/moodStore';
+import { useI18n } from '@/lib/i18n';
 import { Brain, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -9,6 +10,7 @@ interface AiTrendAnalysisProps {
 }
 
 const AiTrendAnalysis = ({ moods }: AiTrendAnalysisProps) => {
+  const { t, lang } = useI18n();
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -31,7 +33,7 @@ const AiTrendAnalysis = ({ moods }: AiTrendAnalysisProps) => {
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke('mood-insights', {
-        body: { type: 'trend-analysis', moods: recentMoods, tasks: [] },
+        body: { type: 'trend-analysis', lang, moods: recentMoods, tasks: [] },
       });
       if (fnError) throw fnError;
       setMessage(data.message);
@@ -50,7 +52,7 @@ const AiTrendAnalysis = ({ moods }: AiTrendAnalysisProps) => {
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-base font-bold text-foreground flex items-center gap-2">
           <Brain className="w-4 h-4 text-primary" />
-          AI Mood Analysis
+          {t('trend.title')}
         </h3>
         <button
           onClick={fetchAnalysis}
@@ -66,19 +68,19 @@ const AiTrendAnalysis = ({ moods }: AiTrendAnalysisProps) => {
           onClick={fetchAnalysis}
           className="w-full py-3 rounded-xl bg-primary/10 text-primary text-sm font-semibold hover:bg-primary/20 transition-colors"
         >
-          ✨ Analyze my mood patterns
+          {t('trend.cta')}
         </button>
       )}
 
       {loading && (
         <div className="flex items-center gap-2 py-3">
           <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <span className="text-sm text-muted-foreground">Analyzing your patterns...</span>
+          <span className="text-sm text-muted-foreground">{t('trend.loading')}</span>
         </div>
       )}
 
       {error && (
-        <p className="text-sm text-muted-foreground py-2">Couldn't analyze right now. Try again later.</p>
+        <p className="text-sm text-muted-foreground py-2">{t('trend.error')}</p>
       )}
 
       {message && !loading && (

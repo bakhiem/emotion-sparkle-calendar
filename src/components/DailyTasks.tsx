@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TaskEntry } from '@/lib/moodStore';
+import { useI18n } from '@/lib/i18n';
 import { Plus, Check, Leaf } from 'lucide-react';
 
 interface DailyTasksProps {
@@ -9,6 +10,7 @@ interface DailyTasksProps {
 }
 
 const DailyTasks = ({ tasks, onToggle, onAdd }: DailyTasksProps) => {
+  const { t } = useI18n();
   const [input, setInput] = useState('');
   const completed = tasks.filter(t => t.completed).length;
   const pct = tasks.length ? (completed / tasks.length) * 100 : 0;
@@ -24,7 +26,7 @@ const DailyTasks = ({ tasks, onToggle, onAdd }: DailyTasksProps) => {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
           <Leaf className="w-5 h-5 text-primary" />
-          Today's Tasks
+          {t('tasks.title')}
         </h2>
         <span className={`text-sm font-bold px-3 py-1 rounded-full ${
           pct === 100 && tasks.length > 0
@@ -68,7 +70,7 @@ const DailyTasks = ({ tasks, onToggle, onAdd }: DailyTasksProps) => {
           </button>
         ))}
         {tasks.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-6">No tasks yet — plant one below 🌱</p>
+          <p className="text-sm text-muted-foreground text-center py-6">{t('tasks.empty')}</p>
         )}
       </div>
 
@@ -77,7 +79,7 @@ const DailyTasks = ({ tasks, onToggle, onAdd }: DailyTasksProps) => {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()}
-          placeholder="Add a task..."
+          placeholder={t('tasks.placeholder')}
           className="flex-1 px-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
         />
         <button

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { MoodEntry, getDateKey } from '@/lib/moodStore';
 import { MOOD_IMAGES } from '@/lib/moodImages';
+import { useI18n } from '@/lib/i18n';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MoodCalendarProps {
@@ -8,10 +9,10 @@ interface MoodCalendarProps {
   onTodayClick?: () => void;
 }
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
 const MoodCalendar = ({ moods, onTodayClick }: MoodCalendarProps) => {
+  const { tArray, lang } = useI18n();
   const [viewDate, setViewDate] = useState(new Date());
+  const DAYS = tArray('calendar.days');
 
   const { year, month, cells } = useMemo(() => {
     const y = viewDate.getFullYear();
@@ -30,7 +31,7 @@ const MoodCalendar = ({ moods, onTodayClick }: MoodCalendarProps) => {
     return { year: y, month: m, cells };
   }, [viewDate, moods]);
 
-  const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
+  const monthName = new Date(year, month).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US', { month: 'long' });
 
   return (
     <div className="nature-card">
@@ -38,7 +39,7 @@ const MoodCalendar = ({ moods, onTodayClick }: MoodCalendarProps) => {
         <button onClick={() => setViewDate(new Date(year, month - 1))} className="p-2 rounded-xl hover:bg-muted/60 transition-colors active:scale-95">
           <ChevronLeft className="w-5 h-5 text-muted-foreground" />
         </button>
-        <h2 className="text-lg font-bold text-foreground">🗓️ {monthName} {year}</h2>
+        <h2 className="text-lg font-bold text-foreground capitalize">🗓️ {monthName} {year}</h2>
         <button onClick={() => setViewDate(new Date(year, month + 1))} className="p-2 rounded-xl hover:bg-muted/60 transition-colors active:scale-95">
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </button>

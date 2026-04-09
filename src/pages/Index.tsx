@@ -9,6 +9,7 @@ import AiGuidedJournal from '@/components/AiGuidedJournal';
 import SettingsPage from '@/components/SettingsPage';
 import BottomTabs, { TabType } from '@/components/BottomTabs';
 import { useAuth } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import {
   MoodEntry, MoodType, TaskEntry,
@@ -18,6 +19,7 @@ import {
 const Index = () => {
   const today = getDateKey(new Date());
   const { user } = useAuth();
+  const { t } = useI18n();
   const [moods, setMoods] = useState<MoodEntry[]>(loadMoods);
   const [tasks, setTasks] = useState<TaskEntry[]>(loadTasks);
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -78,9 +80,9 @@ const Index = () => {
 
   const greeting = (() => {
     const h = new Date().getHours();
-    if (h < 12) return 'Good morning ☀️';
-    if (h < 18) return 'Good afternoon 🌤️';
-    return 'Good evening 🌙';
+    if (h < 12) return t('greeting.morning');
+    if (h < 18) return t('greeting.afternoon');
+    return t('greeting.evening');
   })();
 
   return (
