@@ -1,4 +1,5 @@
 import { CalendarDays, BarChart3, Settings } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 export type TabType = 'home' | 'insights' | 'settings';
 
@@ -8,10 +9,11 @@ interface BottomTabsProps {
 }
 
 const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
+  const { t } = useI18n();
   const tabs = [
-    { id: 'home' as const, label: 'Home', icon: CalendarDays },
-    { id: 'insights' as const, label: 'Insights', icon: BarChart3 },
-    { id: 'settings' as const, label: 'Settings', icon: Settings },
+    { id: 'home' as const, label: t('tab.home'), icon: CalendarDays },
+    { id: 'insights' as const, label: t('tab.insights'), icon: BarChart3 },
+    { id: 'settings' as const, label: t('tab.settings'), icon: Settings },
   ];
 
   return (

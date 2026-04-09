@@ -1,5 +1,6 @@
 import { MOODS, MoodType } from '@/lib/moodStore';
 import { MOOD_IMAGES } from '@/lib/moodImages';
+import { useI18n } from '@/lib/i18n';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,14 @@ const MOOD_RING: Record<MoodType, string> = {
   awful: 'ring-mood-awful/50 bg-mood-awful/10',
 };
 
+const MOOD_LABEL_KEYS: Record<MoodType, string> = {
+  great: 'mood.great',
+  good: 'mood.good',
+  okay: 'mood.okay',
+  bad: 'mood.bad',
+  awful: 'mood.awful',
+};
+
 interface MoodCheckInDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,6 +33,8 @@ interface MoodCheckInDialogProps {
 }
 
 const MoodCheckInDialog = ({ open, onOpenChange, selected, onSelect }: MoodCheckInDialogProps) => {
+  const { t } = useI18n();
+
   const handleSelect = (mood: MoodType) => {
     onSelect(mood);
     onOpenChange(false);
@@ -34,14 +45,14 @@ const MoodCheckInDialog = ({ open, onOpenChange, selected, onSelect }: MoodCheck
       <DialogContent className="sm:max-w-md rounded-3xl border-border/40 bg-card p-8">
         <DialogHeader className="text-center">
           <DialogTitle className="text-xl font-bold text-foreground">
-            How are you feeling? 🌿
+            {t('checkin.title')}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Take a breath and tap what feels right
+            {t('checkin.subtitle')}
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center gap-3 mt-4">
-          {MOODS.map(({ type, label }) => (
+          {MOODS.map(({ type }) => (
             <button
               key={type}
               onClick={() => handleSelect(type)}
@@ -51,17 +62,17 @@ const MoodCheckInDialog = ({ open, onOpenChange, selected, onSelect }: MoodCheck
                   : 'hover:bg-muted/50 hover:scale-105'
               }`}
             >
-              <img src={MOOD_IMAGES[type]} alt={label} width={48} height={48} className="w-12 h-12" />
+              <img src={MOOD_IMAGES[type]} alt={t(MOOD_LABEL_KEYS[type] as any)} width={48} height={48} className="w-12 h-12" />
               <span className={`text-xs font-semibold ${
                 selected === type ? 'text-foreground' : 'text-muted-foreground'
-              }`}>{label}</span>
+              }`}>{t(MOOD_LABEL_KEYS[type] as any)}</span>
             </button>
           ))}
         </div>
         {selected && (
           <div className="mt-2 text-center">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-sm font-semibold text-primary">
-              Feeling {selected} today 🍃
+              {t('checkin.feeling', { mood: t(MOOD_LABEL_KEYS[selected] as any) })}
             </span>
           </div>
         )}

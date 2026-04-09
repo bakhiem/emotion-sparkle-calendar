@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MoodEntry, TaskEntry, getDateKey } from '@/lib/moodStore';
 import { useAuth } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
 import { BookHeart, Send, Sparkles, RotateCcw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ type Phase = 'idle' | 'loading-questions' | 'answering' | 'loading-summary' | 'd
 
 const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
   const { user } = useAuth();
+  const { t, lang } = useI18n();
   const [phase, setPhase] = useState<Phase>('idle');
   const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -41,7 +43,7 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
     setPhase('loading-questions');
     try {
       const { data, error } = await supabase.functions.invoke('mood-insights', {
-        body: { type: 'journal-questions', moods: weekMoods, tasks: weekTasks },
+        body: { type: 'journal-questions', lang, moods: weekMoods, tasks: weekTasks },
       });
       if (error) throw error;
       setQuestions(data.questions);
@@ -51,7 +53,7 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
       setPhase('answering');
     } catch (e) {
       console.error('Journal questions error:', e);
-      toast.error('Không tải được câu hỏi, thử lại nhé.');
+      toast.error(t('journal.errorQ'));
       setPhase('idle');
     }
   };
@@ -75,13 +77,12 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
 
     try {
       const { data, error } = await supabase.functions.invoke('mood-insights', {
-        body: { type: 'journal-summary', moods: weekMoods, answers: qaPairs },
+        body: { type: 'journal-summary', lang, moods: weekMoods, answers: qaPairs },
       });
       if (error) throw error;
       setSummary(data.message);
       setPhase('done');
 
-      // Save to database
       if (user) {
         await supabase.from('journal_entries').insert({
           user_id: user.id,
@@ -93,7 +94,7 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
       }
     } catch (e) {
       console.error('Journal summary error:', e);
-      toast.error('Không tạo được tóm tắt.');
+      toast.error(t('journal.errorS'));
       setPhase('answering');
     }
   };
@@ -112,7 +113,7 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-base font-bold text-foreground flex items-center gap-2">
           <BookHeart className="w-5 h-5 text-secondary" />
-          Nhật ký cảm xúc
+          {t('journal.title')}
         </h3>
         {phase !== 'idle' && (
           <button onClick={reset} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
@@ -121,28 +122,24 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
         )}
       </div>
 
-      {/* Idle state */}
       {phase === 'idle' && (
         <button
           onClick={startJournal}
           className="w-full py-3 rounded-xl bg-secondary/10 text-secondary text-sm font-semibold hover:bg-secondary/20 transition-colors"
         >
-          📝 Bắt đầu viết nhật ký tuần này
+          {t('journal.start')}
         </button>
       )}
 
-      {/* Loading questions */}
       {phase === 'loading-questions' && (
         <div className="flex items-center gap-2 py-4">
           <div className="w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
-          <span className="text-sm text-muted-foreground">AI đang chuẩn bị câu hỏi...</span>
+          <span className="text-sm text-muted-foreground">{t('journal.loadingQ')}</span>
         </div>
       )}
 
-      {/* Answering phase */}
       {phase === 'answering' && questions.length > 0 && (
         <div className="space-y-3">
-          {/* Progress */}
           <div className="flex gap-1">
             {questions.map((_, i) => (
               <div
@@ -154,7 +151,6 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
             ))}
           </div>
 
-          {/* Answered questions */}
           {answers.map((ans, i) => (
             <div key={i} className="space-y-1">
               <p className="text-xs text-muted-foreground">{questions[i]}</p>
@@ -162,7 +158,6 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
             </div>
           ))}
 
-          {/* Current question */}
           <div className="bg-secondary/5 rounded-xl p-3 border border-secondary/15">
             <p className="text-sm font-medium text-foreground mb-2">{questions[currentIdx]}</p>
             <div className="flex gap-2">
@@ -171,7 +166,7 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
                 value={currentAnswer}
                 onChange={e => setCurrentAnswer(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && submitAnswer()}
-                placeholder="Viết câu trả lời..."
+                placeholder={t('journal.placeholder')}
                 className="flex-1 text-sm bg-background border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/30"
               />
               <button
@@ -186,20 +181,18 @@ const AiGuidedJournal = ({ moods, tasks }: AiGuidedJournalProps) => {
         </div>
       )}
 
-      {/* Loading summary */}
       {phase === 'loading-summary' && (
         <div className="flex items-center gap-2 py-4">
           <div className="w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
-          <span className="text-sm text-muted-foreground">AI đang viết nhật ký cho bạn...</span>
+          <span className="text-sm text-muted-foreground">{t('journal.loadingS')}</span>
         </div>
       )}
 
-      {/* Summary */}
       {phase === 'done' && summary && (
         <div className="space-y-3">
           <div className="flex items-center gap-1.5 text-xs text-secondary font-semibold uppercase tracking-wide">
             <Sparkles className="w-3.5 h-3.5" />
-            Nhật ký của bạn
+            {t('journal.yourJournal')}
           </div>
           <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed bg-secondary/5 rounded-xl p-4 border border-secondary/15">
             <ReactMarkdown>{summary}</ReactMarkdown>
